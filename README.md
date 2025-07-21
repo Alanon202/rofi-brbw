@@ -18,9 +18,9 @@ Yet another Rofi frontend for Bitwarden ([rbw](https://github.com/doy/rbw)).
 - [`rbw`](https://github.com/doy/rbw)
 - `bash`, `coreutils`
 - `sed`, `awk`
-- `xclip`
+- `wl-clipboard`
 - `xdg-utils`
-- `xdotool`
+- `wtype`
 - `qrencode` *(for QR code generation)*
 - `Nerd Font` or `Font Awesome` *(for icons)*
 
@@ -38,24 +38,24 @@ All available keybindings are listed below.
 
 Keybinding                                       | Action
 ------------------------------------------------ | ------
-<kbd>Alt</kbd> + <kbd>u</kbd>                    | Type Username
-<kbd>Alt</kbd> + <kbd>p</kbd>                    | Type Password
-<kbd>Alt</kbd> + <kbd>o</kbd>                    | Type OTP
-<kbd>Alt</kbd> + <kbd>l</kbd>                    | Open URL
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>u</kbd>  | Type Username
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>p</kbd>  | Type Password
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>t</kbd>  | Type OTP
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>l</kbd>  | Open URL
 <kbd>Return</kbd>                                | Type Username <*tab*> Password
-<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>u</kbd> | Copy Username
-<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>p</kbd> | Copy Password
-<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>o</kbd> | Copy OTP
-<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>l</kbd> | Copy URL
-<kbd>Alt</kbd> + <kbd>q</kbd>                    | Generate and display QR code
-<kbd>Alt</kbd> + <kbd>g</kbd>                    | Generate and copy a new password
-<kbd>Alt</kbd> + <kbd>n</kbd>                    | Add a new password to the database[^1]
-<kbd>Alt</kbd> + <kbd>e</kbd>                    | Modify selected item's password[^1]
-<kbd>Alt</kbd> + <kbd>d</kbd>                    | Remove selected entry with confirmation
-<kbd>Alt</kbd> + <kbd>v</kbd>                    | View selected entry
-<kbd>Alt</kbd> + <kbd>h</kbd>                    | View the password history for selected entry
-<kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>c</kbd> | Clear last used items
-<kbd>Alt</kbd> + <kbd>s</kbd>                    | Sync Bitwarden database
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>,</kbd>  | Copy Username
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>.</kbd>  | Copy Password
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>-</kbd>  | Copy OTP
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>m</kbd>  | Copy URL
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>q</kbd>  | Generate and display QR code
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>g</kbd>  | Generate and copy a new password
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>a</kbd>  | Add a new password to the database[^1]
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>e</kbd>  | Modify selected item's password[^1]
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Del</kbd>| Remove selected entry with confirmation
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>v</kbd>  | View selected entry
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>n</kbd>  | View the password history for selected entry
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>c</kbd>  | Clear last used items
+<kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>s</kbd>  | Sync Bitwarden database
 <kbd>F1</kbd>                                    | Display key bindings
 
 [^1]: These shortcuts requires you to configure `Editor` variable.
