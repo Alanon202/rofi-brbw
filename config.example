@@ -3,23 +3,23 @@
 # Uncomment the lines you want to override.
 
 ##== Key bindings
-# Kb_TypeUsername='Alt+u'
-# Kb_TypePassword='Alt+p'
-# Kb_TypeOTP='Alt+o'
-# Kb_OpenURL='Alt+l'
-# Kb_CopyUsername='Alt+U'
-# Kb_CopyPassword='Alt+P'
-# Kb_CopyOTP='Alt+O'
-# Kb_CopyURL='Alt+L'
-# Kb_QR='Alt+q'
-# Kb_Generate='Alt+g'
-# Kb_Add='Alt+n'
-# Kb_Edit='Alt+e'
-# Kb_Remove='Alt+d'
-# Kb_View='Alt+v'
-# Kb_History='Alt+h'
-# Kb_ClearLastUsed='Alt+C'
-# Kb_Sync='Alt+s'
+# Kb_TypeUsername='Ctrl+Alt+u'
+# Kb_TypePassword='Ctrl+Alt+p'
+# Kb_TypeOTP='Ctrl+Alt+t'
+# Kb_OpenURL='Ctrl+Alt+l'
+# Kb_CopyUsername='Ctrl+Alt+comma'
+# Kb_CopyPassword='Ctrl+Alt+period'
+# Kb_CopyOTP='Ctrl+Alt+minus'
+# Kb_CopyURL='Ctrl+Alt+m'
+# Kb_QR='Ctrl+Alt+q'
+# Kb_Generate='Ctrl+Alt+g'
+# Kb_Add='Ctrl+Alt+a'
+# Kb_Edit='Ctrl+Alt+e'
+# Kb_Remove='Ctrl+Alt+Delete'
+# Kb_View='Ctrl+Alt+v'
+# Kb_History='Ctrl+Alt+n'
+# Kb_ClearLastUsed='Ctrl+Alt+c'
+# Kb_Sync='Ctrl+Alt+s'
 # Kb_Help='F1'
 
 # EmptyUserPlaceholder=-
@@ -38,7 +38,7 @@
 # PrefixUser=' '
 # Icon=unlock
 # IconLastUsed=recently_used
-# NoFolder=false
+# NoFolder=true
 # NoIcons=false
 
 ##== Last used file location & max item size
