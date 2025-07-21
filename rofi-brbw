@@ -76,37 +76,41 @@ Script=${0##*/}
 rbw unlocked 2>/dev/null || rbw unlock || exit 1
 
 menu_help() {
-	Selected=$(_rofi -p "$Prompt: Help" \
-		-mesg "Hint: All hotkeys are configurable in config file" <<-EOF
-			⮜ Return
-			Type Username                       ⮞ $Kb_TypeUsername
-			Type Password                       ⮞ $Kb_TypePassword
-			Type OTP                            ⮞ $Kb_TypeOTP
-			Open URL                            ⮞ $Kb_OpenURL
-			Type Username<tab>Password          ⮞ Return
-			Copy Username                       ⮞ $Kb_CopyUsername
-			Copy Password                       ⮞ $Kb_CopyPassword
-			Copy OTP                            ⮞ $Kb_CopyOTP
-			Copy URL                            ⮞ $Kb_CopyURL
-			Generate and display QR code        ⮞ $Kb_QR
-			Generate and copy a new password    ⮞ $Kb_Generate
-			Add a new password to the database  ⮞ $Kb_Add
-			Modify password                     ⮞ $Kb_Edit
-			Remove with confirmation            ⮞ $Kb_Remove
-			View entry                          ⮞ $Kb_View
-			View the password history           ⮞ $Kb_History
-			Clear last used items               ⮞ $Kb_ClearLastUsed
-			Sync Bitwarden database             ⮞ $Kb_Sync
-		EOF
+	Selected=$(
+		_rofi -p "$Prompt: Help" \
+			-mesg "Hint: All hotkeys are configurable in config file" <<-EOF
+				⮜ Return
+				Type Username                       ⮞ $Kb_TypeUsername
+				Type Password                       ⮞ $Kb_TypePassword
+				Type OTP                            ⮞ $Kb_TypeOTP
+				Open URL                            ⮞ $Kb_OpenURL
+				Type Username<tab>Password          ⮞ Return
+				Copy Username                       ⮞ $Kb_CopyUsername
+				Copy Password                       ⮞ $Kb_CopyPassword
+				Copy OTP                            ⮞ $Kb_CopyOTP
+				Copy URL                            ⮞ $Kb_CopyURL
+				Generate and display QR code        ⮞ $Kb_QR
+				Generate and copy a new password    ⮞ $Kb_Generate
+				Add a new password to the database  ⮞ $Kb_Add
+				Modify password                     ⮞ $Kb_Edit
+				Remove with confirmation            ⮞ $Kb_Remove
+				View entry                          ⮞ $Kb_View
+				View the password history           ⮞ $Kb_History
+				Clear last used items               ⮞ $Kb_ClearLastUsed
+				Sync Bitwarden database             ⮞ $Kb_Sync
+			EOF
 	)
 	[ "$Selected" = '⮜ Return' ] && exec $0 || exit
 }
 
 clip() {
 	case $Clipboard in
-		both) wl-copy; wl-paste | wl-copy --primary ;;
-		p*) wl-copy --primary ;;
-		c*) wl-copy ;;
+	both)
+		wl-copy
+		wl-paste | wl-copy --primary
+		;;
+	p*) wl-copy --primary ;;
+	c*) wl-copy ;;
 	esac
 }
 
@@ -117,14 +121,14 @@ notify() {
 
 parse_vault() {
 	[ $LastUsedMax -gt 0 ] && {
-		[ -f "$LastUsedFile" ] || :> "$LastUsedFile"
-		LastUsedItems=$(wc -l < $LastUsedFile)
+		[ -f "$LastUsedFile" ] || : >"$LastUsedFile"
+		LastUsedItems=$(wc -l <$LastUsedFile)
 	} || LastUsedItems=0
 
-	mapfile -t Entries < <( {
-			[ "$LastUsedItems" -gt 0 ] && tail -n $LastUsedMax $LastUsedFile | tac
-			rbw list --fields=folder,name,id,user | sed 's|^\t|.&|' | sort
-		} | awk -v OFS="\n" '!x[$0]++')
+	mapfile -t Entries < <({
+		[ "$LastUsedItems" -gt 0 ] && tail -n $LastUsedMax $LastUsedFile | tac
+		rbw list --fields=folder,name,id,user | sed 's|^\t|.&|' | sort
+	} | awk -v OFS="\n" '!x[$0]++')
 
 	i=0
 	while IFS=$'\t' read -r F N I U; do
@@ -149,24 +153,30 @@ rbw_add() {
 	[ -n "$AddFolder" ] && AddOpts+=(--folder "$AddFolder")
 
 	TmpFile=$(mktemp "/tmp/$Script.XXXX")
-	printf '%s \n%s \n%s' "Passname:" "Username:" "URI: https://" > "$TmpFile"
+	printf '%s \n%s \n%s' "Passname:" "Username:" "URI: https://" >"$TmpFile"
 	if [ -t 2 ]; then
 		${EDITOR:-$Editor} "$TmpFile"
 	else
 		$Editor "$TmpFile" >/dev/null 2>&1
 	fi
 
-	mapfile -t NewItem <<< "$(< "$TmpFile")"
-	ItemName=${NewItem[0]/Passname:*([[:space:]])}
-	ItemUser=${NewItem[1]/Username:*([[:space:]])}
-	ItemURI=${NewItem[2]/URI:*([[:space:]])}
+	mapfile -t NewItem <<<"$(<"$TmpFile")"
+	ItemName=${NewItem[0]/Passname:*([[:space:]])/}
+	ItemUser=${NewItem[1]/Username:*([[:space:]])/}
+	ItemURI=${NewItem[2]/URI:*([[:space:]])/}
 
 	rm -f "$TmpFile"
-	[ -z "$ItemName" ] && { notify "Password name can not be empty!"; exit 1 ;}
+	[ -z "$ItemName" ] && {
+		notify "Password name can not be empty!"
+		exit 1
+	}
 
 	coproc rbw_gen
 	rbw add "${AddOpts[@]}" --uri "$ItemURI" "$ItemName" -- "$ItemUser" 2>/dev/null ||
-		{ notify "Failed to add password.\nNetwork error?"; exit 1 ;}
+		{
+			notify "Failed to add password.\nNetwork error?"
+			exit 1
+		}
 }
 
 rbw_rm() {
@@ -181,7 +191,10 @@ rbw_rm() {
 }
 
 rbw_get() {
-	[ "$1" = history ] && { local Cmd=history; shift ;}
+	[ "$1" = history ] && {
+		local Cmd=history
+		shift
+	}
 	# shellcheck disable=SC2086
 	Selected=$(
 		_rofi -p "$SelFolder/$SelName" -mesg "Enter: Copy field to clipboard" <<-EOF
@@ -190,9 +203,9 @@ rbw_get() {
 		EOF
 	)
 	case "$Selected" in
-		'⮜ Return') exec $0 ;;
-		'') exit ;;
-		*) printf '%s' "${Selected##*: }" | clip ;;
+	'⮜ Return') exec $0 ;;
+	'') exit ;;
+	*) printf '%s' "${Selected##*: }" | clip ;;
 	esac
 }
 
@@ -205,6 +218,7 @@ qr_code() {
 
 autotype() {
 	[ -z "$1" ] || [ "$1" = $EmptyUserPlaceholder ] && exit
+
 	wtype "$1"
 	[ -n "$2" ] && {
 		wtype -s 250 "	"
@@ -217,7 +231,7 @@ autotype() {
 cache() {
 	[ $LastUsedMax = 0 ] && return
 	sed -i "\|^$LastUsed$|d" $LastUsedFile
-	printf '%s\n' "$LastUsed" >> $LastUsedFile
+	printf '%s\n' "$LastUsed" >>$LastUsedFile
 	# shellcheck disable=SC2016
 	[ "$LastUsedItems" -ge $LastUsedMax ] && sed -i -e :a -e '$q;N;'$LastUsedMax',$D;ba' $LastUsedFile
 }
@@ -226,15 +240,16 @@ print_list() {
 	ColumnLength=$(printf '%s\n' "${FolderAndName[@]}" | wc -L)
 	local _Icon=$Icon
 
-	for ((i=0; i<${#ID[@]}; i++)); {
+	for ((i = 0; i < ${#ID[@]}; i++)); do
 		if [ $NoIcons = false ]; then
 			[ $i -lt "$LastUsedItems" ] && Icon=$IconLastUsed || Icon=$_Icon
 		else
-			PrefixUser=''; Icon=''
+			PrefixUser=''
+			Icon=''
 		fi
 		printf '%*s\t%s%b\n' "-${ColumnLength}" "${FolderAndName[i]}" \
 			"${PrefixUser}${User[i]}" "${Icon:+\0icon\x1f$Icon}"
-	}
+	done
 }
 
 menu() {
@@ -271,30 +286,57 @@ menu() {
 	LastUsed=$(printf '%s\t%s\t%s\t%s\n' "$SelFolder" "$SelName" "$SelID" "$SelUser")
 
 	case $Ret in
-		10) menu_help ;;
-		11) rbw edit "$SelID" 2>/dev/null || notify "Failed to edit password!\nNetwork error?" ;;
-		12) Cache=false; rbw_rm ;;
-		13) Cache=false; rbw_gen ;;
-		14) Cache=false; rbw sync; exec $0 ;;
-		15) Cache=false; rbw_add ;;
-		16) Cache=false; printf '' > $LastUsedFile ;;
-		17) rbw_get "$SelID" ;;
-		18) rbw_get history "$SelID" ;;
-		19) qr_code "$SelID" ;;
-		20) [ -n "${SelUser%"$EmptyUserPlaceholder"}" ] && clip <<< "$SelUser" ;;
-		21) clip <<< "$(rbw get "$SelID")" ;;
-		22) clip <<< "$(rbw code "$SelID" 2>/dev/null)" ;;
-		23) clip <<< "$(rbw get --full "$SelID" | awk '/^URI:/{print $2; exit}')" ;;
-		24) sleep $TypeSleep; autotype "$SelUser" ;;
-		25) sleep $TypeSleep; CopyOTP=true autotype "$(rbw get "$SelID")" ;;
-		26) sleep $TypeSleep; Enter=true autotype "$(rbw code "$SelID" 2>/dev/null)" ;;
-		27) setsid -f xdg-open "$(rbw get --full "$SelID" | awk '/^URI:/{print $2; exit}')" >/dev/null 2>&1 ;;
-		0)  sleep $TypeSleep; CopyOTP=true autotype "$SelUser" "$(rbw get "$SelID")" ;;
-		*)  exit $Ret ;;
+	10) menu_help ;;
+	11) rbw edit "$SelID" 2>/dev/null || notify "Failed to edit password!\nNetwork error?" ;;
+	12)
+		Cache=false
+		rbw_rm
+		;;
+	13)
+		Cache=false
+		rbw_gen
+		;;
+	14)
+		Cache=false
+		rbw sync
+		exec $0
+		;;
+	15)
+		Cache=false
+		rbw_add
+		;;
+	16)
+		Cache=false
+		printf '' >$LastUsedFile
+		;;
+	17) rbw_get "$SelID" ;;
+	18) rbw_get history "$SelID" ;;
+	19) qr_code "$SelID" ;;
+	20) [ -n "${SelUser%"$EmptyUserPlaceholder"}" ] && clip <<<"$SelUser" ;;
+	21) clip <<<"$(rbw get "$SelID")" ;;
+	22) clip <<<"$(rbw code "$SelID" 2>/dev/null)" ;;
+	23) clip <<<"$(rbw get --full "$SelID" | awk '/^URI:/{print $2; exit}')" ;;
+	24)
+		sleep $TypeSleep
+		autotype "$SelUser"
+		;;
+	25)
+		sleep $TypeSleep
+		CopyOTP=true autotype "$(rbw get "$SelID")"
+		;;
+	26)
+		sleep $TypeSleep
+		Enter=true autotype "$(rbw code "$SelID" 2>/dev/null)"
+		;;
+	27) setsid -f xdg-open "$(rbw get --full "$SelID" | awk '/^URI:/{print $2; exit}')" >/dev/null 2>&1 ;;
+	0)
+		sleep $TypeSleep
+		CopyOTP=true autotype "$SelUser" "$(rbw get "$SelID")"
+		;;
+	*) exit $Ret ;;
 	esac
 
 	${Cache:-:} && cache
 }
 
 menu
-
