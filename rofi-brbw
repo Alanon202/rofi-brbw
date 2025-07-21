@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 # Rofi frontend for Bitwarden (rbw) <https://github.com/doy/rbw>
+# Original work by Yusuf Aktepe: <https://github.com/yusufaktepe/rofi-brbw>
 #------------------------------------------------------------------------------
-# @author:  Yusuf Aktepe <yusuf@yusufaktepe.com>
-# @url:     https://github.com/yusufaktepe/rofi-brbw
+# @author:  alanon202
+# @url:     https://github.com/alanon202/rofi-brbw
 # @license: GPL-3.0
 #------------------------------------------------------------------------------
 # Dependencies:
-#   rofi, rbw, xdotool, xclip, sed, awk, coreutils, xdg-utils, nerd/awesome font
+#   rofi, rbw, wtype, wl-clipboard, sed, awk, coreutils, xdg-utils, nerd/awesome font
 #------------------------------------------------------------------------------
 
 # Key bindings
@@ -103,8 +104,9 @@ menu_help() {
 
 clip() {
 	case $Clipboard in
-		both) xclip -r; xclip -o | xclip -selection clipboard ;;
-		p*|c*) xclip -r -selection "$Clipboard" ;;
+		both) wl-copy; wl-paste | wl-copy --primary ;;
+		p*) wl-copy --primary ;;
+		c*) wl-copy ;;
 	esac
 }
 
@@ -203,20 +205,13 @@ qr_code() {
 
 autotype() {
 	[ -z "$1" ] || [ "$1" = $EmptyUserPlaceholder ] && exit
-
-	XRepeatStatus=$(xset q | awk '/auto repeat:/ {print $3; exit}')
-	xset r off
-
-	xdotool keyup Shift_L Shift_R Alt_L Alt_R
-	xdotool type --delay $TypeKeyDelay --clearmodifiers -- "$1"
+	wtype "$1"
 	[ -n "$2" ] && {
-		xdotool key Tab
-		xdotool type --delay $TypeKeyDelay --clearmodifiers -- "$2"
+		wtype -s 250 "	"
+		wtype "$2"
 	}
-	${Enter:-false} && xdotool key Return
-	${CopyOTP:-false} && OTP=$(rbw code "$SelID" 2>/dev/null) && clip <<< "$OTP"
-
-	xset r "$XRepeatStatus"
+	${Enter:-false} && wtype -s 250 -k return
+	${CopyOTP:-false} && OTP=$(rbw code "$SelID" 2>/dev/null) && clip <<<"$OTP"
 }
 
 cache() {
